@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where Water Stress Meets Livelihoods</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --ink: #0f1923;
+  --ink2: #3a4a58;
+  --ink3: #7a8fa0;
+  --cream: #fafaf7;
+  --paper: #f2f0ea;
+  --line: #dddbd3;
+  --blue: #0072B2;
+  --blue-lt: #e0eef8;
+  --orange: #D55E00;
+  --orange-lt: #faeee5;
+  --teal: #009E73;
+  --gold: #b5860d;
+  --zone1: #f0f7ff;
+  --zone2: #daeaf8;
+  --zone3: #fdf3e0;
+  --zone4: #fce0c8;
+  --zone5: #f8d0b8;
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --r: 6px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--cream);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HERO ─────────────────────────────────────────────────────────── */
+.hero {
+  background: var(--ink);
+  color: white;
+  padding: 64px 60px 52px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 50%, #1a3a5c 0%, transparent 70%),
+              radial-gradient(ellipse 40% 60% at 20% 80%, #0d2a1f 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-inner { position: relative; max-width: 1200px; margin: 0 auto; }
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: #6fa8d0; margin-bottom: 16px;
+}
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 5vw, 60px);
+  line-height: 1.1;
+  color: white;
+  margin-bottom: 18px;
+  max-width: 700px;
+}
+.hero-title em { font-style: italic; color: #7ecff5; }
+.hero-sub {
+  font-size: 17px; font-weight: 300; color: #b8cfe0; line-height: 1.65;
+  max-width: 620px; margin-bottom: 40px;
+}
+.hero-stats {
+  display: flex; gap: 40px; flex-wrap: wrap;
+}
+.hstat { border-left: 2px solid #2a5a8a; padding-left: 16px; }
+.hstat-num { font-size: 32px; font-weight: 600; color: #7ecff5; line-height: 1; }
+.hstat-lbl { font-size: 12px; color: #7a9bb8; margin-top: 4px; }
+
+/* ── NAV TABS ─────────────────────────────────────────────────────── */
+.nav-bar {
+  background: white;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 8px rgba(0,0,0,.06);
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; gap: 0; padding: 0 60px; overflow-x: auto;
+}
+.nav-tab {
+  padding: 16px 22px; font-size: 13px; font-weight: 500;
+  color: var(--ink3); cursor: pointer; border: none; background: none;
+  border-bottom: 2px solid transparent; white-space: nowrap;
+  transition: color .2s, border-color .2s; font-family: var(--sans);
+}
+.nav-tab:hover { color: var(--ink); }
+.nav-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* ── MAIN LAYOUT ──────────────────────────────────────────────────── */
+.main { max-width: 1200px; margin: 0 auto; padding: 0 60px 80px; }
+.section { display: none; padding-top: 40px; }
+.section.active { display: block; }
+
+/* ── TYPOGRAPHY ───────────────────────────────────────────────────── */
+.section-heading {
+  font-family: var(--serif); font-size: 28px;
+  color: var(--ink); margin-bottom: 6px;
+}
+.section-sub {
+  font-size: 14px; color: var(--ink3); margin-bottom: 28px;
+  max-width: 640px; line-height: 1.6;
+}
+
+/* ── STAT CARDS ───────────────────────────────────────────────────── */
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 32px; }
+.stat-card {
+  background: white; border: 1px solid var(--line); border-radius: var(--r);
+  padding: 16px 18px;
+}
+.sc-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--ink3); margin-bottom: 6px; }
+.sc-value { font-size: 24px; font-weight: 600; color: var(--ink); line-height: 1; }
+.sc-note { font-size: 12px; color: var(--ink3); margin-top: 4px; }
+.sc-orange { border-top: 3px solid var(--orange); }
+.sc-blue { border-top: 3px solid var(--blue); }
+.sc-teal { border-top: 3px solid var(--teal); }
+
+/* ── CHART CONTAINERS ─────────────────────────────────────────────── */
+.chart-card {
+  background: white; border: 1px solid var(--line);
+  border-radius: var(--r); padding: 28px 28px 20px;
+  margin-bottom: 24px;
+}
+.chart-card h3 { font-family: var(--serif); font-size: 18px; margin-bottom: 4px; color: var(--ink); }
+.chart-caption { font-size: 12px; color: var(--ink3); margin-top: 12px; line-height: 1.5; border-top: 1px solid var(--line); padding-top: 10px; }
+.chart-wrap { position: relative; width: 100%; }
+
+/* Scatter zone legend */
+.zone-legend {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.zl-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--ink3); font-weight: 500;
+}
+.zl-swatch { width: 28px; height: 8px; border-radius: 2px; }
+
+/* ── SCATTER CONTROLS ─────────────────────────────────────────────── */
+.scatter-controls {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.sc-btn {
+  padding: 6px 14px; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--line); border-radius: 20px;
+  background: white; color: var(--ink2); cursor: pointer;
+  transition: all .15s; font-family: var(--sans);
+}
+.sc-btn:hover { border-color: var(--blue); color: var(--blue); }
+.sc-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+/* ── TABLE ────────────────────────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; border-radius: var(--r); border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { background: var(--paper); }
+th {
+  padding: 10px 14px; text-align: left;
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .8px; color: var(--ink3);
+  border-bottom: 1px solid var(--line); cursor: pointer; white-space: nowrap; user-select: none;
+}
+th:hover { color: var(--ink); }
+td { padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #f9f8f5; }
+.bws-bar-bg { display: inline-block; width: 80px; height: 5px; background: var(--line); border-radius: 2px; vertical-align: middle; margin-left: 6px; }
+.bws-bar-fill { height: 5px; border-radius: 2px; display: block; }
+.flag-badge {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  padding: 2px 7px; border-radius: 10px;
+  background: var(--orange-lt); color: var(--orange); letter-spacing: .3px;
+}
+.zone-badge {
+  display: inline-block; font-size: 10px; font-weight: 500;
+  padding: 2px 7px; border-radius: 10px;
+}
+
+/* ── TWO-COL GRID ────────────────────────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+@media(max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+
+/* ── INSIGHT PANEL ───────────────────────────────────────────────── */
+.insight-panel {
+  background: var(--ink); color: white; border-radius: var(--r);
+  padding: 28px 32px; margin-bottom: 24px;
+}
+.insight-panel h3 { font-family: var(--serif); font-size: 20px; margin-bottom: 12px; color: #7ecff5; }
+.insight-panel p { font-size: 14px; color: #b8cfe0; line-height: 1.7; margin-bottom: 10px; }
+.insight-panel p:last-child { margin-bottom: 0; }
+.insight-panel strong { color: white; }
+
+/* ── LOLLIPOP ────────────────────────────────────────────────────── */
+.lollipop-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.lp-label { width: 120px; font-size: 12px; color: var(--ink2); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+.lp-bar-wrap { flex: 1; position: relative; height: 18px; display: flex; align-items: center; }
+.lp-track { position: absolute; top: 50%; transform: translateY(-50%); height: 3px; background: var(--line); left: 0; right: 0; border-radius: 2px; }
+.lp-fill { position: absolute; top: 50%; transform: translateY(-50%); height: 3px; left: 0; border-radius: 2px; }
+.lp-dot { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; }
+.lp-val { width: 38px; font-size: 11px; font-weight: 600; color: var(--ink3); text-align: right; flex-shrink: 0; }
+.ag-micro { width: 38px; height: 5px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── TOOLTIP ─────────────────────────────────────────────────────── */
+#tooltip {
+  position: fixed; pointer-events: none; z-index: 999;
+  background: white; border: 1px solid var(--line);
+  border-radius: var(--r); padding: 10px 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  font-size: 12px; line-height: 1.6; max-width: 220px;
+  display: none;
+}
+#tooltip strong { font-size: 13px; display: block; margin-bottom: 3px; }
+
+/* ── SOURCES ─────────────────────────────────────────────────────── */
+.sources {
+  background: var(--paper); border-radius: var(--r);
+  padding: 20px 24px; margin-top: 24px;
+  font-size: 12px; color: var(--ink3); line-height: 1.7;
+}
+.sources strong { color: var(--ink2); }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────── */
+@media(max-width: 700px) {
+  .hero { padding: 40px 24px 36px; }
+  .main { padding: 0 24px 60px; }
+  .nav-inner { padding: 0 16px; }
+  .hero-stats { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<div id="tooltip"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Global Risk Analysis · WRI Aqueduct 4.0 × World Bank / ILO</div>
+    <h1 class="hero-title">Where <em>water stress</em><br>meets livelihoods</h1>
+    <p class="hero-sub">Countries with severe water scarcity are often the same countries where agriculture employs the most people — creating a dangerous convergence of climate risk and economic vulnerability.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-num">161</div><div class="hstat-lbl">Countries analysed</div></div>
+      <div class="hstat"><div class="hstat-num">28%</div><div class="hstat-lbl">Global avg. ag. employment (2025)</div></div>
+      <div class="hstat"><div class="hstat-num">4</div><div class="hstat-lbl">Countries: extreme stress + high ag. employment</div></div>
+      <div class="hstat"><div class="hstat-num">157</div><div class="hstat-lbl">Countries with 2024 data</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <div class="nav-inner">
+    <button class="nav-tab active" onclick="showSection('overview',this)">Overview</button>
+    <button class="nav-tab" onclick="showSection('scatter',this)">Scatter analysis</button>
+    <button class="nav-tab" onclick="showSection('lollipop',this)">Top water-stressed</button>
+    <button class="nav-tab" onclick="showSection('trend',this)">Global trend</button>
+    <button class="nav-tab" onclick="showSection('table',this)">All countries</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ══ OVERVIEW ══════════════════════════════════════════════════════ -->
+<div class="section active" id="sec-overview">
+  <h2 class="section-heading">The double exposure</h2>
+  <p class="section-sub">Water stress and agricultural employment are both unevenly distributed — and where they overlap, the stakes are highest.</p>
+
+  <div class="stat-row">
+    <div class="stat-card sc-orange">
+      <div class="sc-label">Ext. High stress (≥4)</div>
+      <div class="sc-value" id="ov-exthigh">—</div>
+      <div class="sc-note">countries, avg ag. 8.5%</div>
+    </div>
+    <div class="stat-card sc-orange">
+      <div class="sc-label">High stress (3–4)</div>
+      <div class="sc-value" id="ov-high">—</div>
+      <div class="sc-note">countries, avg ag. 28.6%</div>
+    </div>
+    <div class="stat-card sc-blue">
+      <div class="sc-label">Low stress (&lt;1)</div>
+      <div class="sc-value" id="ov-low">—</div>
+      <div class="sc-note">countries, avg ag. 25.0%</div>
+    </div>
+    <div class="stat-card sc-teal">
+      <div class="sc-label">High-high overlap</div>
+      <div class="sc-value" id="ov-hh">4</div>
+      <div class="sc-note">BWS ≥ 3.0 &amp; ag% ≥ p75 (37.5%)</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-label">Corr. (BWS × ag%)</div>
+      <div class="sc-value" id="ov-corr">—</div>
+      <div class="sc-note">Pearson r across 161 countries</div>
+    </div>
+  </div>
+
+  <div class="insight-panel">
+    <h3>Key finding</h3>
+    <p>Globally, water stress and agricultural employment do <strong>not</strong> show a simple positive correlation — many extremely water-stressed countries (Gulf states, Israel) have <strong>low</strong> agricultural employment, because they have diversified into oil, services, and finance.</p>
+    <p>The most vulnerable countries are those that combine <strong>high stress with large agricultural workforce shares</strong> — mainly in South Asia and the Sahel. <strong>India</strong> stands out: with a BWS score of 4.1 and 42% of its workforce in agriculture, it represents the largest absolute number of water-exposed agricultural jobs in the world.</p>
+    <p>The trend line tells a structural story: globally, ag. employment has declined from 32.6% (1991) to 22% (2025), even as water stress intensifies — meaning the workers who remain in agriculture are increasingly concentrated in the highest-stress contexts.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card">
+      <h3>Distribution by BWS zone</h3>
+      <p style="font-size:12px;color:var(--ink3);margin-bottom:14px">Number of countries in each water stress zone</p>
+      <div class="chart-wrap" style="height:200px"><canvas id="zoneBarChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Ag. employment by BWS zone</h3>
+      <p style="font-size:12px;color:var(--ink3);margin-bottom:14px">Average agricultural employment % per zone</p>
+      <div class="chart-wrap" style="height:200px"><canvas id="zoneAgChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Regional breakdown</h3>
+    <p style="font-size:12px;color:var(--ink3);margin-bottom:14px">Average BWS score and ag. employment % by World Bank region</p>
+    <div class="chart-wrap" style="height:260px"><canvas id="regionChart"></canvas></div>
+    <div class="chart-caption">Sub-Saharan Africa combines the highest average agricultural employment with moderate water stress; Middle East &amp; North Africa has the highest water stress but low ag. employment due to oil-based economies.</div>
+  </div>
+</div>
+
+<!-- ══ SCATTER ════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-scatter">
+  <h2 class="section-heading">Scatter: water stress × agricultural employment</h2>
+  <p class="section-sub">Each dot is one country. X = Baseline Water Stress (0–5), Y = % of workers employed in agriculture. Hover for details.</p>
+
+  <div class="zone-legend">
+    <div class="zl-item"><div class="zl-swatch" style="background:#ddeeff"></div>Low (&lt;1)</div>
+    <div class="zl-item"><div class="zl-swatch" style="background:#c5ddf5"></div>Low–Med (1–2)</div>
+    <div class="zl-item"><div class="zl-swatch" style="background:#fdebc5"></div>Med–High (2–3)</div>
+    <div class="zl-item"><div class="zl-swatch" style="background:#f9d0a8"></div>High (3–4)</div>
+    <div class="zl-item"><div class="zl-swatch" style="background:#f5b88a"></div>Ext. High (4–5)</div>
+    <div class="zl-item" style="margin-left:16px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#D55E00;margin-right:5px"></span>High-high flag</div>
+  </div>
+
+  <div class="scatter-controls">
+    <button class="sc-btn active" onclick="setRegionFilter('all',this)">All regions</button>
+    <button class="sc-btn" onclick="setRegionFilter('Sub-Saharan Africa',this)">Sub-Saharan Africa</button>
+    <button class="sc-btn" onclick="setRegionFilter('Middle East & North Africa',this)">MENA</button>
+    <button class="sc-btn" onclick="setRegionFilter('South Asia',this)">South Asia</button>
+    <button class="sc-btn" onclick="setRegionFilter('East Asia & Pacific',this)">East Asia & Pacific</button>
+    <button class="sc-btn" onclick="setRegionFilter('Europe & Central Asia',this)">Europe & Central Asia</button>
+    <button class="sc-btn" onclick="setRegionFilter('Latin America & Caribbean',this)">Latin America</button>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-wrap" style="height:500px"><canvas id="scatterChart"></canvas></div>
+    <div class="chart-caption">
+      <strong>Sources:</strong> WRI Aqueduct 4.0 (Baseline Water Stress, country-level, weight = Total); World Bank / ILO modeled estimates (Employment in agriculture, %, latest year per country, predominantly 2024). n = 161 countries after inner join on ISO3.
+      Y-axis capped at 90% — maximum observed value is 85.4% (Burundi).
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOLLIPOP ═══════════════════════════════════════════════════════ -->
+<div class="section" id="sec-lollipop">
+  <h2 class="section-heading">Top 20 most water-stressed countries</h2>
+  <p class="section-sub">Ranked by Baseline Water Stress score. Line color intensity encodes agricultural employment share — darker means more agricultural workers exposed.</p>
+  <div class="chart-card">
+    <div id="lollipop-container" style="padding: 10px 0"></div>
+    <div class="chart-caption">BWS score (0–5 scale) on x-axis. Dot color intensity reflects agricultural employment as % of total employment. High BWS + dark color = greatest livelihood exposure.</div>
+  </div>
+</div>
+
+<!-- ══ TREND ══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-trend">
+  <h2 class="section-heading">Structural decline in agricultural employment, 1991–2025</h2>
+  <p class="section-sub">The global share of workers in agriculture has fallen by a third since 1991 — but the pace of transition varies dramatically, and those still in agriculture face growing water pressure.</p>
+  <div class="chart-card">
+    <h3>Global average (unweighted, 161 countries)</h3>
+    <div class="chart-wrap" style="height:280px"><canvas id="globalTrendChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Country trajectories — selected comparators</h3>
+    <p style="font-size:12px;color:var(--ink3);margin-bottom:14px">High-high countries (orange) vs peers (blue). All had data from 1991.</p>
+    <div class="chart-wrap" style="height:340px"><canvas id="multiTrendChart"></canvas></div>
+    <div class="chart-caption">Data: World Bank / ILO modeled estimates. High-high = BWS ≥ 3.0 and ag% ≥ p75 at latest year. India and Afghanistan have declined substantially but remain above the global average, still at high water stress.</div>
+  </div>
+</div>
+
+<!-- ══ TABLE ══════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-table">
+  <h2 class="section-heading">All 161 countries</h2>
+  <p class="section-sub">Sortable by any column. Highlight = high water stress AND high agricultural employment.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+    <input type="text" id="tbl-q" placeholder="Search country or ISO3…" oninput="filterTbl()"
+      style="padding:7px 12px;font-size:13px;font-family:var(--sans);border:1px solid var(--line);border-radius:var(--r);outline:none;flex:1;min-width:180px;background:white;color:var(--ink)">
+    <select id="tbl-zone" onchange="filterTbl()"
+      style="padding:7px 12px;font-size:13px;font-family:var(--sans);border:1px solid var(--line);border-radius:var(--r);outline:none;background:white;color:var(--ink)">
+      <option value="">All BWS zones</option>
+      <option value="Low">Low (&lt;1)</option>
+      <option value="Low–Med">Low–Med (1–2)</option>
+      <option value="Med–High">Med–High (2–3)</option>
+      <option value="High">High (3–4)</option>
+      <option value="Ext. High">Ext. High (4–5)</option>
+    </select>
+    <label style="font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:6px;cursor:pointer">
+      <input type="checkbox" id="tbl-hh" onchange="filterTbl()" style="cursor:pointer">
+      High-high only
+    </label>
+    <span id="tbl-count" style="font-size:12px;color:var(--ink3)"></span>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th onclick="sortTbl('rank')">#<span id="ta-rank"></span></th>
+        <th onclick="sortTbl('iso3')">ISO3<span id="ta-iso3"></span></th>
+        <th onclick="sortTbl('country_bws')">Country<span id="ta-country_bws"></span></th>
+        <th onclick="sortTbl('bws_score')">BWS score<span id="ta-bws_score"> ↓</span></th>
+        <th onclick="sortTbl('bws_zone')">Zone<span id="ta-bws_zone"></span></th>
+        <th onclick="sortTbl('ag_pct')">Ag. employment %<span id="ta-ag_pct"></span></th>
+        <th onclick="sortTbl('year_used')">Year<span id="ta-year_used"></span></th>
+        <th>Flag</th>
+        <th>Region</th>
+      </tr></thead>
+      <tbody id="tbl-body"></tbody>
+    </table>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px;font-size:12px;color:var(--ink3)">
+    <button onclick="tpg(-1)" style="padding:5px 12px;font-size:12px;font-family:var(--sans);border:1px solid var(--line);border-radius:var(--r);background:white;cursor:pointer;color:var(--ink)">← Prev</button>
+    <span id="tpg-info"></span>
+    <button onclick="tpg(1)" style="padding:5px 12px;font-size:12px;font-family:var(--sans);border:1px solid var(--line);border-radius:var(--r);background:white;cursor:pointer;color:var(--ink)">Next →</button>
+  </div>
+
+  <div class="sources">
+    <strong>Data sources:</strong> WRI Aqueduct 4.0 — Baseline Water Stress (country_baseline sheet, indicator = bws, weight = Tot). Score range 0–5; 25 countries with no-data sentinel (−9999) excluded from BWS dataset.
+    World Bank World Development Indicators — Employment in agriculture (% of total employment), modeled ILO estimate (SL.AGR.EMPL.ZS), downloaded 2026-02-24. Latest year per country preferred (2018–2024). No country required pre-2018 fallback.
+    Inner join on ISO3: 161 countries retained. Dropped from BWS only: AND, LIE, SMR. Dropped from employment only: small island states and territories lacking Aqueduct coverage.
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+const _D = 
+{"scatter":[{"iso3":"BHR","country_bws":"Bahrain","bws_score":5.0,"ag_pct":0.86,"year_used":2024,"high_high_flag":false,"geo_mean":2.073644135332772,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"CYP","country_bws":"Cyprus","bws_score":5.0,"ag_pct":2.2,"year_used":2024,"high_high_flag":false,"geo_mean":3.3166247903554,"bws_zone":"Ext. High","region":"Europe & Central Asia"},{"iso3":"KWT","country_bws":"Kuwait","bws_score":5.0,"ag_pct":1.93,"year_used":2024,"high_high_flag":false,"geo_mean":3.1064449134018135,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"LBN","country_bws":"Lebanon","bws_score":5.0,"ag_pct":3.51,"year_used":2023,"high_high_flag":false,"geo_mean":4.189272013130682,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"OMN","country_bws":"Oman","bws_score":5.0,"ag_pct":6.05,"year_used":2024,"high_high_flag":false,"geo_mean":5.5,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"QAT","country_bws":"Qatar","bws_score":5.0,"ag_pct":1.66,"year_used":2024,"high_high_flag":false,"geo_mean":2.8809720581775866,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"ARE","country_bws":"United Arab Emirates","bws_score":4.999991212,"ag_pct":1.48,"year_used":2024,"high_high_flag":false,"geo_mean":2.7202917111515816,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"SAU","country_bws":"Saudi Arabia","bws_score":4.980808426,"ag_pct":2.57,"year_used":2024,"high_high_flag":false,"geo_mean":3.577803467886407,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"ISR","country_bws":"Israel","bws_score":4.941652066,"ag_pct":0.78,"year_used":2024,"high_high_flag":false,"geo_mean":1.9632851579635597,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"EGY","country_bws":"Egypt","bws_score":4.851625216,"ag_pct":17.98,"year_used":2024,"high_high_flag":false,"geo_mean":9.339819130137371,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"LBY","country_bws":"Libya","bws_score":4.805210731,"ag_pct":10.52,"year_used":2024,"high_high_flag":false,"geo_mean":7.109909766665115,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"YEM","country_bws":"Yemen","bws_score":4.693675833,"ag_pct":31.81,"year_used":2024,"high_high_flag":false,"geo_mean":12.219076407312052,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"BWA","country_bws":"Botswana","bws_score":4.664307436,"ag_pct":18.11,"year_used":2024,"high_high_flag":false,"geo_mean":9.190789284167057,"bws_zone":"Ext. High","region":"Sub-Saharan Africa"},{"iso3":"IRN","country_bws":"Iran","bws_score":4.653368575,"ag_pct":13.77,"year_used":2024,"high_high_flag":false,"geo_mean":8.004803887525915,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"JOR","country_bws":"Jordan","bws_score":4.619580866,"ag_pct":3.2,"year_used":2024,"high_high_flag":false,"geo_mean":3.8448223328523254,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"CHL","country_bws":"Chile","bws_score":4.471868674,"ag_pct":6.23,"year_used":2024,"high_high_flag":false,"geo_mean":5.278232832967868,"bws_zone":"Ext. High","region":"Latin America & Caribbean"},{"iso3":"BEL","country_bws":"Belgium","bws_score":4.410841962,"ag_pct":1.01,"year_used":2024,"high_high_flag":false,"geo_mean":2.1106753378054144,"bws_zone":"Ext. High","region":"Europe & Central Asia"},{"iso3":"GRC","country_bws":"Greece","bws_score":4.338904439,"ag_pct":10.99,"year_used":2024,"high_high_flag":false,"geo_mean":6.905400769297174,"bws_zone":"Ext. High","region":"Europe & Central Asia"},{"iso3":"TUN","country_bws":"Tunisia","bws_score":4.280358914,"ag_pct":12.71,"year_used":2024,"high_high_flag":false,"geo_mean":7.375863461110164,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"NAM","country_bws":"Namibia","bws_score":4.175797611,"ag_pct":22.64,"year_used":2024,"high_high_flag":false,"geo_mean":9.723171186040076,"bws_zone":"Ext. High","region":"Sub-Saharan Africa"},{"iso3":"ZAF","country_bws":"South Africa","bws_score":4.167753556,"ag_pct":5.44,"year_used":2024,"high_high_flag":false,"geo_mean":4.761573200596627,"bws_zone":"Ext. High","region":"Sub-Saharan Africa"},{"iso3":"IRQ","country_bws":"Iraq","bws_score":4.146234505,"ag_pct":8.18,"year_used":2024,"high_high_flag":false,"geo_mean":5.823761520778473,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"IND","country_bws":"India","bws_score":4.107794474,"ag_pct":42.35,"year_used":2024,"high_high_flag":true,"geo_mean":13.189582858221863,"bws_zone":"Ext. High","region":"South Asia"},{"iso3":"SYR","country_bws":"Syria","bws_score":4.013468628,"ag_pct":16.44,"year_used":2024,"high_high_flag":false,"geo_mean":8.122895065450496,"bws_zone":"Ext. High","region":"Middle East & North Africa"},{"iso3":"MEX","country_bws":"Mexico","bws_score":3.995019932,"ag_pct":11.61,"year_used":2024,"high_high_flag":false,"geo_mean":6.810446491275003,"bws_zone":"High","region":"Latin America & Caribbean"},{"iso3":"MAR","country_bws":"Morocco","bws_score":3.988406127,"ag_pct":28.27,"year_used":2024,"high_high_flag":false,"geo_mean":10.618485824744035,"bws_zone":"High","region":"Middle East & North Africa"},{"iso3":"ERI","country_bws":"Eritrea","bws_score":3.942539986,"ag_pct":55.99,"year_used":2024,"high_high_flag":true,"geo_mean":14.857416121793857,"bws_zone":"High","region":"Sub-Saharan Africa"},{"iso3":"ESP","country_bws":"Spain","bws_score":3.940242667,"ag_pct":3.47,"year_used":2024,"high_high_flag":false,"geo_mean":3.697653587680977,"bws_zone":"High","region":"Europe & Central Asia"},{"iso3":"DZA","country_bws":"Algeria","bws_score":3.873999102,"ag_pct":9.66,"year_used":2024,"high_high_flag":false,"geo_mean":6.117420316221536,"bws_zone":"High","region":"Middle East & North Africa"},{"iso3":"PAK","country_bws":"Pakistan","bws_score":3.790570063,"ag_pct":36.54,"year_used":2024,"high_high_flag":false,"geo_mean":11.768917966492078,"bws_zone":"High","region":"South Asia"},{"iso3":"PER","country_bws":"Peru","bws_score":3.743217047,"ag_pct":23.42,"year_used":2024,"high_high_flag":false,"geo_mean":9.363019985065716,"bws_zone":"High","region":"Latin America & Caribbean"},{"iso3":"TKM","country_bws":"Turkmenistan","bws_score":3.73812683,"ag_pct":22.22,"year_used":2024,"high_high_flag":false,"geo_mean":9.11379054853687,"bws_zone":"High","region":"Europe & Central Asia"},{"iso3":"UZB","country_bws":"Uzbekistan","bws_score":3.628291849,"ag_pct":25.65,"year_used":2024,"high_high_flag":false,"geo_mean":9.64705581650951,"bws_zone":"High","region":"Europe & Central Asia"},{"iso3":"THA","country_bws":"Thailand","bws_score":3.623007642,"ag_pct":28.99,"year_used":2024,"high_high_flag":false,"geo_mean":10.248462886773801,"bws_zone":"High","region":"East Asia & Pacific"},{"iso3":"ALB","country_bws":"Albania","bws_score":3.473828698,"ag_pct":31.43,"year_used":2024,"high_high_flag":false,"geo_mean":10.449039954854227,"bws_zone":"High","region":"Europe & Central Asia"},{"iso3":"NER","country_bws":"Niger","bws_score":3.471298326,"ag_pct":73.46,"year_used":2024,"high_high_flag":true,"geo_mean":15.968768738633544,"bws_zone":"High","region":"Sub-Saharan Africa"},{"iso3":"TUR","country_bws":"Turkey","bws_score":3.386483429,"ag_pct":14.55,"year_used":2024,"high_high_flag":false,"geo_mean":7.019496697908619,"bws_zone":"High","region":"Europe & Central Asia"},{"iso3":"AFG","country_bws":"Afghanistan","bws_score":3.369185991,"ag_pct":51.45,"year_used":2024,"high_high_flag":true,"geo_mean":13.166040378069255,"bws_zone":"High","region":"South Asia"},{"iso3":"ITA","country_bws":"Italy","bws_score":3.344018796,"ag_pct":3.43,"year_used":2024,"high_high_flag":false,"geo_mean":3.386736551649685,"bws_zone":"High","region":"Europe & Central Asia"},{"iso3":"KGZ","country_bws":"Kyrgyzstan","bws_score":3.276846479,"ag_pct":16.01,"year_used":2024,"high_high_flag":false,"geo_mean":7.243087195995227,"bws_zone":"High","region":"Europe & Central Asia"},{"iso3":"PRT","country_bws":"Portugal","bws_score":3.260032396,"ag_pct":2.86,"year_used":2024,"high_high_flag":false,"geo_mean":3.0534722288830465,"bws_zone":"High","region":"Europe & Central Asia"},{"iso3":"NPL","country_bws":"Nepal","bws_score":3.18229337,"ag_pct":23.48,"year_used":2024,"high_high_flag":false,"geo_mean":8.644087478016404,"bws_zone":"High","region":"South Asia"},{"iso3":"DJI","country_bws":"Djibouti","bws_score":3.175518835,"ag_pct":1.19,"year_used":2024,"high_high_flag":false,"geo_mean":1.9439309179212105,"bws_zone":"High","region":"Middle East & North Africa"},{"iso3":"MNG","country_bws":"Mongolia","bws_score":3.128436223,"ag_pct":27.26,"year_used":2024,"high_high_flag":false,"geo_mean":9.234780530092744,"bws_zone":"High","region":"East Asia & Pacific"},{"iso3":"MKD","country_bws":"Macedonia","bws_score":3.009558697,"ag_pct":8.76,"year_used":2024,"high_high_flag":false,"geo_mean":5.134562706377244,"bws_zone":"High","region":"Europe & Central Asia"},{"iso3":"ARM","country_bws":"Armenia","bws_score":2.9915904,"ag_pct":27.48,"year_used":2024,"high_high_flag":false,"geo_mean":9.066912605291837,"bws_zone":"Med\u2013High","region":"Europe & Central Asia"},{"iso3":"LSO","country_bws":"Lesotho","bws_score":2.94993564,"ag_pct":31.12,"year_used":2024,"high_high_flag":false,"geo_mean":9.581335873290321,"bws_zone":"Med\u2013High","region":"Sub-Saharan Africa"},{"iso3":"LUX","country_bws":"Luxembourg","bws_score":2.931524656,"ag_pct":0.9,"year_used":2024,"high_high_flag":false,"geo_mean":1.624306679909924,"bws_zone":"Med\u2013High","region":"Europe & Central Asia"},{"iso3":"AUS","country_bws":"Australia","bws_score":2.906718433,"ag_pct":2.23,"year_used":2024,"high_high_flag":false,"geo_mean":2.545973704811187,"bws_zone":"Med\u2013High","region":"East Asia & Pacific"},{"iso3":"CHN","country_bws":"China","bws_score":2.800257843,"ag_pct":22.22,"year_used":2024,"high_high_flag":false,"geo_mean":7.888075130946712,"bws_zone":"Med\u2013High","region":"East Asia & Pacific"},{"iso3":"MRT","country_bws":"Mauritania","bws_score":2.727897971,"ag_pct":32.8,"year_used":2024,"high_high_flag":false,"geo_mean":9.459125406125029,"bws_zone":"Med\u2013High","region":"Sub-Saharan Africa"},{"iso3":"GUY","country_bws":"Guyana","bws_score":2.695733857,"ag_pct":12.56,"year_used":2024,"high_high_flag":false,"geo_mean":5.818798608297077,"bws_zone":"Med\u2013High","region":"Latin America & Caribbean"},{"iso3":"IDN","country_bws":"Indonesia","bws_score":2.669162882,"ag_pct":27.96,"year_used":2024,"high_high_flag":false,"geo_mean":8.638853753868045,"bws_zone":"Med\u2013High","region":"East Asia & Pacific"},{"iso3":"BGD","country_bws":"Bangladesh","bws_score":2.660561137,"ag_pct":44.74,"year_used":2024,"high_high_flag":false,"geo_mean":10.910247718057551,"bws_zone":"Med\u2013High","region":"South Asia"},{"iso3":"USA","country_bws":"United States","bws_score":2.604411175,"ag_pct":1.57,"year_used":2024,"high_high_flag":false,"geo_mean":2.022109182203078,"bws_zone":"Med\u2013High","region":"North America"},{"iso3":"KAZ","country_bws":"Kazakhstan","bws_score":2.511560337,"ag_pct":11.65,"year_used":2024,"high_high_flag":false,"geo_mean":5.40922156377884,"bws_zone":"Med\u2013High","region":"Europe & Central Asia"},{"iso3":"AZE","country_bws":"Azerbaijan","bws_score":2.468350889,"ag_pct":34.69,"year_used":2024,"high_high_flag":false,"geo_mean":9.253490819113075,"bws_zone":"Med\u2013High","region":"Europe & Central Asia"},{"iso3":"KOR","country_bws":"South Korea","bws_score":2.381249355,"ag_pct":5.2,"year_used":2024,"high_high_flag":false,"geo_mean":3.5188771854101417,"bws_zone":"Med\u2013High","region":"East Asia & Pacific"},{"iso3":"LKA","country_bws":"Sri Lanka","bws_score":2.361447216,"ag_pct":26.32,"year_used":2024,"high_high_flag":false,"geo_mean":7.883735835574401,"bws_zone":"Med\u2013High","region":"South Asia"},{"iso3":"TJK","country_bws":"Tajikistan","bws_score":2.335048113,"ag_pct":44.12,"year_used":2024,"high_high_flag":false,"geo_mean":10.149991268250432,"bws_zone":"Med\u2013High","region":"Europe & Central Asia"},{"iso3":"PRK","country_bws":"North Korea","bws_score":2.322401108,"ag_pct":54.3,"year_used":2024,"high_high_flag":false,"geo_mean":11.229709709712,"bws_zone":"Med\u2013High","region":"East Asia & Pacific"},{"iso3":"SEN","country_bws":"Senegal","bws_score":2.220100987,"ag_pct":30.65,"year_used":2024,"high_high_flag":false,"geo_mean":8.249005712905648,"bws_zone":"Med\u2013High","region":"Sub-Saharan Africa"},{"iso3":"ZWE","country_bws":"Zimbabwe","bws_score":2.174587686,"ag_pct":55.17,"year_used":2024,"high_high_flag":false,"geo_mean":10.953173176601382,"bws_zone":"Med\u2013High","region":"Sub-Saharan Africa"},{"iso3":"LTU","country_bws":"Lithuania","bws_score":2.139633569,"ag_pct":4.85,"year_used":2024,"high_high_flag":false,"geo_mean":3.221369710177644,"bws_zone":"Med\u2013High","region":"Europe & Central Asia"},{"iso3":"MMR","country_bws":"Myanmar","bws_score":2.131153639,"ag_pct":45.36,"year_used":2024,"high_high_flag":false,"geo_mean":9.83204602638942,"bws_zone":"Med\u2013High","region":"East Asia & Pacific"},{"iso3":"VNM","country_bws":"Vietnam","bws_score":2.112769594,"ag_pct":25.87,"year_used":2024,"high_high_flag":false,"geo_mean":7.393060894973069,"bws_zone":"Med\u2013High","region":"East Asia & Pacific"},{"iso3":"DEU","country_bws":"Germany","bws_score":2.041904513,"ag_pct":1.09,"year_used":2024,"high_high_flag":false,"geo_mean":1.4918699404338167,"bws_zone":"Med\u2013High","region":"Europe & Central Asia"},{"iso3":"PHL","country_bws":"Philippines","bws_score":2.026275245,"ag_pct":21.19,"year_used":2024,"high_high_flag":false,"geo_mean":6.552615694632945,"bws_zone":"Med\u2013High","region":"East Asia & Pacific"},{"iso3":"JPN","country_bws":"Japan","bws_score":1.967749978,"ag_pct":2.88,"year_used":2024,"high_high_flag":false,"geo_mean":2.3805713466812963,"bws_zone":"Low\u2013Med","region":"East Asia & Pacific"},{"iso3":"SLV","country_bws":"El Salvador","bws_score":1.947996154,"ag_pct":14.07,"year_used":2024,"high_high_flag":false,"geo_mean":5.235294250257573,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"FRA","country_bws":"France","bws_score":1.916452159,"ag_pct":2.39,"year_used":2024,"high_high_flag":false,"geo_mean":2.14016837188339,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"TZA","country_bws":"Tanzania","bws_score":1.90521696,"ag_pct":65.09,"year_used":2024,"high_high_flag":false,"geo_mean":11.136003409051202,"bws_zone":"Low\u2013Med","region":"Sub-Saharan Africa"},{"iso3":"KHM","country_bws":"Cambodia","bws_score":1.87051284,"ag_pct":34.16,"year_used":2024,"high_high_flag":false,"geo_mean":7.9935423070375995,"bws_zone":"Low\u2013Med","region":"East Asia & Pacific"},{"iso3":"CZE","country_bws":"Czech Republic","bws_score":1.835970493,"ag_pct":2.82,"year_used":2024,"high_high_flag":false,"geo_mean":2.275398160819332,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"ARG","country_bws":"Argentina","bws_score":1.834917254,"ag_pct":7.25,"year_used":2024,"high_high_flag":false,"geo_mean":3.6473483644286024,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"URY","country_bws":"Uruguay","bws_score":1.832983309,"ag_pct":8.31,"year_used":2024,"high_high_flag":false,"geo_mean":3.902831190019625,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"VEN","country_bws":"Venezuela","bws_score":1.820253759,"ag_pct":8.9,"year_used":2024,"high_high_flag":false,"geo_mean":4.024954466214494,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"TLS","country_bws":"Timor-Leste","bws_score":1.772192187,"ag_pct":46.35,"year_used":2024,"high_high_flag":false,"geo_mean":9.063173167685257,"bws_zone":"Low\u2013Med","region":"East Asia & Pacific"},{"iso3":"SOM","country_bws":"Somalia","bws_score":1.674658334,"ag_pct":30.29,"year_used":2024,"high_high_flag":false,"geo_mean":7.122176699356735,"bws_zone":"Low\u2013Med","region":"Sub-Saharan Africa"},{"iso3":"SUR","country_bws":"Suriname","bws_score":1.667553064,"ag_pct":7.09,"year_used":2024,"high_high_flag":false,"geo_mean":3.4384518643947892,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"POL","country_bws":"Poland","bws_score":1.65863867,"ag_pct":6.5,"year_used":2024,"high_high_flag":false,"geo_mean":3.283466362702685,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"CUB","country_bws":"Cuba","bws_score":1.650924902,"ag_pct":15.84,"year_used":2024,"high_high_flag":false,"geo_mean":5.1137706682720925,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"BFA","country_bws":"Burkina Faso","bws_score":1.646041049,"ag_pct":52.23,"year_used":2024,"high_high_flag":false,"geo_mean":9.272147754930893,"bws_zone":"Low\u2013Med","region":"Sub-Saharan Africa"},{"iso3":"SVK","country_bws":"Slovakia","bws_score":1.615225882,"ag_pct":2.24,"year_used":2024,"high_high_flag":false,"geo_mean":1.9021319553805935,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"DOM","country_bws":"Dominican Republic","bws_score":1.604479359,"ag_pct":7.19,"year_used":2024,"high_high_flag":false,"geo_mean":3.3964991669673643,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"HTI","country_bws":"Haiti","bws_score":1.602577632,"ag_pct":46.71,"year_used":2024,"high_high_flag":false,"geo_mean":8.651959384481644,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"NLD","country_bws":"Netherlands","bws_score":1.581120297,"ag_pct":1.75,"year_used":2024,"high_high_flag":false,"geo_mean":1.6634183237388003,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"SDN","country_bws":"Sudan","bws_score":1.457958178,"ag_pct":39.77,"year_used":2022,"high_high_flag":false,"geo_mean":7.614656705266495,"bws_zone":"Low\u2013Med","region":"Sub-Saharan Africa"},{"iso3":"BGR","country_bws":"Bulgaria","bws_score":1.45732336,"ag_pct":4.84,"year_used":2024,"high_high_flag":false,"geo_mean":2.655832273017255,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"SSD","country_bws":"South Sudan","bws_score":1.393236802,"ag_pct":63.76,"year_used":2023,"high_high_flag":false,"geo_mean":9.425114243101778,"bws_zone":"Low\u2013Med","region":"Sub-Saharan Africa"},{"iso3":"UKR","country_bws":"Ukraine","bws_score":1.372503853,"ag_pct":14.12,"year_used":2021,"high_high_flag":false,"geo_mean":4.4022442463316365,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"GBR","country_bws":"United Kingdom","bws_score":1.298003739,"ag_pct":0.87,"year_used":2024,"high_high_flag":false,"geo_mean":1.062667988098823,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"MDA","country_bws":"Moldova","bws_score":1.262222811,"ag_pct":50.84,"year_used":2024,"high_high_flag":false,"geo_mean":8.010705818543084,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"SRB","country_bws":"Serbia","bws_score":1.235523742,"ag_pct":18.57,"year_used":2024,"high_high_flag":false,"geo_mean":4.789955729329865,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"CAN","country_bws":"Canada","bws_score":1.233315456,"ag_pct":1.13,"year_used":2024,"high_high_flag":false,"geo_mean":1.18052804510524,"bws_zone":"Low\u2013Med","region":"North America"},{"iso3":"EST","country_bws":"Estonia","bws_score":1.218060312,"ag_pct":3.07,"year_used":2024,"high_high_flag":false,"geo_mean":1.9337645042351976,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"ROU","country_bws":"Romania","bws_score":1.188014819,"ag_pct":11.26,"year_used":2024,"high_high_flag":false,"geo_mean":3.6574645400796437,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"BLR","country_bws":"Belarus","bws_score":1.180970816,"ag_pct":9.75,"year_used":2024,"high_high_flag":false,"geo_mean":3.3932971364146702,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"RUS","country_bws":"Russia","bws_score":1.167592537,"ag_pct":5.24,"year_used":2024,"high_high_flag":false,"geo_mean":2.4734964915843323,"bws_zone":"Low\u2013Med","region":"Europe & Central Asia"},{"iso3":"AGO","country_bws":"Angola","bws_score":1.130789734,"ag_pct":52.15,"year_used":2024,"high_high_flag":false,"geo_mean":7.679237242597731,"bws_zone":"Low\u2013Med","region":"Sub-Saharan Africa"},{"iso3":"BRA","country_bws":"Brazil","bws_score":1.037909741,"ag_pct":7.72,"year_used":2024,"high_high_flag":false,"geo_mean":2.830664798332717,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"MYS","country_bws":"Malaysia","bws_score":1.032631026,"ag_pct":9.44,"year_used":2024,"high_high_flag":false,"geo_mean":3.122184633464203,"bws_zone":"Low\u2013Med","region":"East Asia & Pacific"},{"iso3":"GTM","country_bws":"Guatemala","bws_score":1.026662175,"ag_pct":29.45,"year_used":2024,"high_high_flag":false,"geo_mean":5.498654476665178,"bws_zone":"Low\u2013Med","region":"Latin America & Caribbean"},{"iso3":"ETH","country_bws":"Ethiopia","bws_score":0.961237436,"ag_pct":61.01,"year_used":2024,"high_high_flag":false,"geo_mean":7.658008616498155,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"DNK","country_bws":"Denmark","bws_score":0.951421243,"ag_pct":1.67,"year_used":2024,"high_high_flag":false,"geo_mean":1.2605052462445365,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"GEO","country_bws":"Georgia","bws_score":0.928146972,"ag_pct":34.77,"year_used":2024,"high_high_flag":false,"geo_mean":5.6808159815681405,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"MDG","country_bws":"Madagascar","bws_score":0.898642942,"ag_pct":69.52,"year_used":2024,"high_high_flag":false,"geo_mean":7.904027917956768,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"TCD","country_bws":"Chad","bws_score":0.853364564,"ag_pct":71.87,"year_used":2024,"high_high_flag":false,"geo_mean":7.831430981288158,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"ZMB","country_bws":"Zambia","bws_score":0.84556736,"ag_pct":55.32,"year_used":2024,"high_high_flag":false,"geo_mean":6.83935569737384,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"FIN","country_bws":"Finland","bws_score":0.80862528,"ag_pct":3.57,"year_used":2024,"high_high_flag":false,"geo_mean":1.6990562820577781,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"NGA","country_bws":"Nigeria","bws_score":0.801556379,"ag_pct":34.1,"year_used":2024,"high_high_flag":false,"geo_mean":5.228104104156688,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"KEN","country_bws":"Kenya","bws_score":0.788210351,"ag_pct":46.5,"year_used":2024,"high_high_flag":false,"geo_mean":6.05407146650087,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"SWE","country_bws":"Sweden","bws_score":0.781293393,"ag_pct":1.81,"year_used":2024,"high_high_flag":false,"geo_mean":1.1891766232692265,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"MWI","country_bws":"Malawi","bws_score":0.75280282,"ag_pct":65.24,"year_used":2024,"high_high_flag":false,"geo_mean":7.008056504966266,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"PAN","country_bws":"Panama","bws_score":0.745018749,"ag_pct":16.36,"year_used":2024,"high_high_flag":false,"geo_mean":3.491204195351512,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"LAO","country_bws":"Laos","bws_score":0.741620199,"ag_pct":68.91,"year_used":2024,"high_high_flag":false,"geo_mean":7.148779470167617,"bws_zone":"Low","region":"East Asia & Pacific"},{"iso3":"MNE","country_bws":"Montenegro","bws_score":0.715174797,"ag_pct":4.35,"year_used":2024,"high_high_flag":false,"geo_mean":1.7638056488598735,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"MLI","country_bws":"Mali","bws_score":0.677467506,"ag_pct":63.54,"year_used":2024,"high_high_flag":false,"geo_mean":6.560966798516816,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"ECU","country_bws":"Ecuador","bws_score":0.6573219,"ag_pct":32.59,"year_used":2024,"high_high_flag":false,"geo_mean":4.6284036903666905,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"CRI","country_bws":"Costa Rica","bws_score":0.648226696,"ag_pct":11.77,"year_used":2024,"high_high_flag":false,"geo_mean":2.7621781644057646,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"LVA","country_bws":"Latvia","bws_score":0.571722006,"ag_pct":6.92,"year_used":2024,"high_high_flag":false,"geo_mean":1.9890490897712907,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"SVN","country_bws":"Slovenia","bws_score":0.526117478,"ag_pct":3.77,"year_used":2024,"high_high_flag":false,"geo_mean":1.408354675520339,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"COL","country_bws":"Colombia","bws_score":0.496141456,"ag_pct":14.25,"year_used":2024,"high_high_flag":false,"geo_mean":2.6589501213824978,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"HUN","country_bws":"Hungary","bws_score":0.425174735,"ag_pct":4.24,"year_used":2024,"high_high_flag":false,"geo_mean":1.342661862272106,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"CHE","country_bws":"Switzerland","bws_score":0.405618449,"ag_pct":2.3,"year_used":2024,"high_high_flag":false,"geo_mean":0.9658790983865423,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"BIH","country_bws":"Bosnia and Herzegovina","bws_score":0.395887518,"ag_pct":17.12,"year_used":2024,"high_high_flag":false,"geo_mean":2.6033813220809585,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"MOZ","country_bws":"Mozambique","bws_score":0.37050251,"ag_pct":73.07,"year_used":2024,"high_high_flag":false,"geo_mean":5.203135439876613,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"BTN","country_bws":"Bhutan","bws_score":0.367776177,"ag_pct":43.2,"year_used":2024,"high_high_flag":false,"geo_mean":3.985966739249087,"bws_zone":"Low","region":"South Asia"},{"iso3":"IRL","country_bws":"Ireland","bws_score":0.363338153,"ag_pct":3.95,"year_used":2024,"high_high_flag":false,"geo_mean":1.1979923640616412,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"GIN","country_bws":"Guinea","bws_score":0.355084919,"ag_pct":48.24,"year_used":2024,"high_high_flag":false,"geo_mean":4.138755427971071,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"SWZ","country_bws":"Swaziland","bws_score":0.313848799,"ag_pct":14.91,"year_used":2024,"high_high_flag":false,"geo_mean":2.1632118696720393,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"GNB","country_bws":"Guinea-Bissau","bws_score":0.307489251,"ag_pct":61.7,"year_used":2024,"high_high_flag":false,"geo_mean":4.355695901540878,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"AUT","country_bws":"Austria","bws_score":0.26150335,"ag_pct":2.83,"year_used":2024,"high_high_flag":false,"geo_mean":0.8602641922688635,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"NIC","country_bws":"Nicaragua","bws_score":0.213853504,"ag_pct":30.67,"year_used":2024,"high_high_flag":false,"geo_mean":2.56103240270013,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"UGA","country_bws":"Uganda","bws_score":0.198089531,"ag_pct":65.41,"year_used":2024,"high_high_flag":false,"geo_mean":3.5995883407287006,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"NOR","country_bws":"Norway","bws_score":0.188372239,"ag_pct":2.56,"year_used":2024,"high_high_flag":false,"geo_mean":0.694429932995403,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"HRV","country_bws":"Croatia","bws_score":0.167654501,"ag_pct":4.49,"year_used":2024,"high_high_flag":false,"geo_mean":0.8676224463958964,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"BOL","country_bws":"Bolivia","bws_score":0.155531505,"ag_pct":24.92,"year_used":2024,"high_high_flag":false,"geo_mean":1.96871661358358,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"HND","country_bws":"Honduras","bws_score":0.112622036,"ag_pct":22.63,"year_used":2024,"high_high_flag":false,"geo_mean":1.596445011480195,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"GHA","country_bws":"Ghana","bws_score":0.112402618,"ag_pct":35.19,"year_used":2024,"high_high_flag":false,"geo_mean":1.9888308443454912,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"BLZ","country_bws":"Belize","bws_score":0.068201146,"ag_pct":16.39,"year_used":2024,"high_high_flag":false,"geo_mean":1.0572685481655075,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"NZL","country_bws":"New Zealand","bws_score":0.050880091,"ag_pct":5.53,"year_used":2024,"high_high_flag":false,"geo_mean":0.5304402918613932,"bws_zone":"Low","region":"East Asia & Pacific"},{"iso3":"GMB","country_bws":"Gambia","bws_score":0.024514391,"ag_pct":28.3,"year_used":2024,"high_high_flag":false,"geo_mean":0.8329209237976917,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"COG","country_bws":"Republic of Congo","bws_score":0.014405137,"ag_pct":36.76,"year_used":2024,"high_high_flag":false,"geo_mean":0.7276900687243162,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"COD","country_bws":"Democratic Republic of the Congo","bws_score":0.012159601,"ag_pct":58.9,"year_used":2024,"high_high_flag":false,"geo_mean":0.8462862984238845,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"CAF","country_bws":"Central African Republic","bws_score":0.010127157,"ag_pct":66.05,"year_used":2024,"high_high_flag":false,"geo_mean":0.8178622866045359,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"CMR","country_bws":"Cameroon","bws_score":0.008131338,"ag_pct":42.37,"year_used":2024,"high_high_flag":false,"geo_mean":0.5869623421140405,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"BEN","country_bws":"Benin","bws_score":0.003432064,"ag_pct":41.05,"year_used":2024,"high_high_flag":false,"geo_mean":0.3753481413301523,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"TGO","country_bws":"Togo","bws_score":0.003242327,"ag_pct":38.28,"year_used":2024,"high_high_flag":false,"geo_mean":0.35230140158676637,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"PRY","country_bws":"Paraguay","bws_score":0.000343884,"ag_pct":16.22,"year_used":2024,"high_high_flag":false,"geo_mean":0.07468466027237454,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"BDI","country_bws":"Burundi","bws_score":0.0,"ag_pct":85.39,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"BRN","country_bws":"Brunei","bws_score":0.0,"ag_pct":1.24,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"East Asia & Pacific"},{"iso3":"CIV","country_bws":"C\u00c3\u00b4te d'Ivoire","bws_score":0.0,"ag_pct":46.26,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"GAB","country_bws":"Gabon","bws_score":0.0,"ag_pct":29.08,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"GNQ","country_bws":"Equatorial Guinea","bws_score":0.0,"ag_pct":55.11,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"ISL","country_bws":"Iceland","bws_score":0.0,"ag_pct":3.7,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"Europe & Central Asia"},{"iso3":"JAM","country_bws":"Jamaica","bws_score":0.0,"ag_pct":14.25,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"Latin America & Caribbean"},{"iso3":"LBR","country_bws":"Liberia","bws_score":0.0,"ag_pct":41.87,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"PNG","country_bws":"Papua New Guinea","bws_score":0.0,"ag_pct":37.46,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"East Asia & Pacific"},{"iso3":"RWA","country_bws":"Rwanda","bws_score":0.0,"ag_pct":36.5,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"Sub-Saharan Africa"},{"iso3":"SLE","country_bws":"Sierra Leone","bws_score":0.0,"ag_pct":45.09,"year_used":2024,"high_high_flag":false,"geo_mean":0.0,"bws_zone":"Low","region":"Sub-Saharan Africa"}],"p75":37.46,"n":161,"ts":{"NER":{"name":"Niger","series":{"1991":75.08,"1992":75.16,"1993":75.32,"1994":75.43,"1995":75.49,"1996":75.72,"1997":75.82,"1998":75.51,"1999":75.73,"2000":76.02,"2001":75.89,"2002":75.83,"2003":75.94,"2004":76.1,"2005":75.89,"2006":75.72,"2007":75.73,"2008":75.44,"2009":75.49,"2010":75.13,"2011":75.17,"2012":74.55,"2013":74.55,"2014":74.37,"2015":74.5,"2016":74.57,"2017":74.63,"2018":74.49,"2019":74.45,"2020":75.33,"2021":74.95,"2022":73.87,"2023":74.19,"2024":73.46,"2025":72.99}},"ERI":{"name":"Eritrea","series":{"1991":59.49,"1992":60.21,"1993":58.25,"1994":56.17,"1995":56.31,"1996":55.38,"1997":54.14,"1998":54.42,"1999":54.45,"2000":54.63,"2001":53.86,"2002":53.45,"2003":54.66,"2004":55.0,"2005":55.89,"2006":56.4,"2007":56.37,"2008":57.87,"2009":57.3,"2010":57.4,"2011":56.09,"2012":55.84,"2013":57.75,"2014":54.89,"2015":57.35,"2016":56.2,"2017":57.98,"2018":56.07,"2019":55.57,"2020":57.02,"2021":57.41,"2022":56.82,"2023":56.36,"2024":55.99,"2025":55.48}},"IND":{"name":"India","series":{"1991":63.13,"1992":62.9,"1993":62.66,"1994":62.37,"1995":61.97,"1996":61.51,"1997":61.16,"1998":60.65,"1999":59.88,"2000":59.61,"2001":58.89,"2002":58.21,"2003":57.16,"2004":56.0,"2005":55.02,"2006":54.27,"2007":53.37,"2008":52.88,"2009":51.94,"2010":51.06,"2011":49.08,"2012":47.09,"2013":46.24,"2014":45.25,"2015":44.28,"2016":43.2,"2017":42.27,"2018":41.29,"2019":40.65,"2020":44.68,"2021":44.08,"2022":42.86,"2023":43.51,"2024":42.35,"2025":41.63}},"AFG":{"name":"Afghanistan","series":{"1991":65.33,"1992":65.27,"1993":65.32,"1994":65.51,"1995":64.83,"1996":64.46,"1997":64.09,"1998":63.87,"1999":63.67,"2000":63.45,"2001":64.52,"2002":62.59,"2003":62.04,"2004":61.98,"2005":60.79,"2006":60.35,"2007":58.74,"2008":58.07,"2009":54.88,"2010":51.86,"2011":51.32,"2012":48.76,"2013":46.58,"2014":43.91,"2015":43.65,"2016":43.41,"2017":43.0,"2018":43.61,"2019":43.88,"2020":45.98,"2021":50.23,"2022":51.54,"2023":51.29,"2024":51.45,"2025":51.63}},"PAK":{"name":"Pakistan","series":{"1991":40.66,"1992":41.43,"1993":40.87,"1994":43.39,"1995":40.09,"1996":40.09,"1997":37.38,"1998":40.59,"1999":40.59,"2000":41.67,"2001":41.67,"2002":41.45,"2003":41.45,"2004":42.45,"2005":42.45,"2006":42.75,"2007":42.97,"2008":44.05,"2009":42.61,"2010":42.67,"2011":42.82,"2012":42.59,"2013":42.24,"2014":42.23,"2015":41.01,"2016":42.27,"2017":39.87,"2018":37.42,"2019":38.31,"2020":38.31,"2021":37.1,"2022":36.73,"2023":36.77,"2024":36.54,"2025":36.23}},"YEM":{"name":"Yemen, Rep.","series":{"1991":59.76,"1992":59.69,"1993":59.57,"1994":59.51,"1995":60.07,"1996":60.66,"1997":61.13,"1998":61.57,"1999":58.98,"2000":54.77,"2001":50.34,"2002":45.68,"2003":41.04,"2004":36.32,"2005":34.83,"2006":33.5,"2007":32.41,"2008":31.31,"2009":30.39,"2010":29.18,"2011":30.16,"2012":29.8,"2013":29.26,"2014":29.24,"2015":30.45,"2016":30.84,"2017":31.0,"2018":30.69,"2019":30.37,"2020":32.06,"2021":32.46,"2022":32.1,"2023":31.96,"2024":31.81,"2025":31.62}},"BGD":{"name":"Bangladesh","series":{"1991":69.92,"1992":69.71,"1993":69.4,"1994":68.88,"1995":68.02,"1996":66.99,"1997":67.3,"1998":67.52,"1999":67.57,"2000":67.6,"2001":63.66,"2002":59.42,"2003":54.81,"2004":53.18,"2005":51.36,"2006":50.49,"2007":49.71,"2008":48.99,"2009":48.33,"2010":47.59,"2011":46.77,"2012":45.92,"2013":45.1,"2014":44.4,"2015":43.54,"2016":42.66,"2017":40.6,"2018":40.77,"2019":40.84,"2020":42.55,"2021":43.47,"2022":43.67,"2023":45.37,"2024":44.74,"2025":44.26}},"NPL":{"name":"Nepal","series":{"1991":39.69,"1992":39.02,"1993":38.16,"1994":36.97,"1995":36.1,"1996":35.16,"1997":35.48,"1998":35.79,"1999":35.84,"2000":35.34,"2001":34.92,"2002":34.96,"2003":34.42,"2004":33.76,"2005":33.18,"2006":32.58,"2007":31.95,"2008":31.35,"2009":30.54,"2010":29.78,"2011":29.27,"2012":28.58,"2013":27.97,"2014":27.03,"2015":26.34,"2016":26.1,"2017":25.44,"2018":24.51,"2019":23.77,"2020":24.95,"2021":24.99,"2022":24.32,"2023":23.95,"2024":23.48,"2025":22.91}},"ETH":{"name":"Ethiopia","series":{"1991":77.15,"1992":78.04,"1993":77.35,"1994":77.19,"1995":76.98,"1996":76.22,"1997":76.25,"1998":76.71,"1999":76.37,"2000":76.6,"2001":76.67,"2002":77.3,"2003":78.37,"2004":77.95,"2005":78.12,"2006":77.38,"2007":76.54,"2008":75.76,"2009":75.1,"2010":73.84,"2011":72.71,"2012":72.09,"2013":71.03,"2014":69.56,"2015":67.96,"2016":66.42,"2017":64.72,"2018":63.37,"2019":61.81,"2020":63.63,"2021":63.47,"2022":62.97,"2023":62.17,"2024":61.01,"2025":60.14}},"KEN":{"name":"Kenya","series":{"1991":61.29,"1992":61.42,"1993":61.49,"1994":61.33,"1995":61.09,"1996":60.78,"1997":60.74,"1998":60.51,"1999":60.4,"2000":60.38,"2001":59.88,"2002":59.65,"2003":59.29,"2004":58.75,"2005":58.11,"2006":57.42,"2007":56.69,"2008":56.59,"2009":56.38,"2010":55.64,"2011":55.13,"2012":54.48,"2013":53.89,"2014":53.14,"2015":52.51,"2016":51.87,"2017":51.29,"2018":50.4,"2019":49.73,"2020":51.21,"2021":51.24,"2022":47.83,"2023":47.16,"2024":46.5,"2025":45.79}},"VNM":{"name":"Viet Nam","series":{"1991":73.99,"1992":73.04,"1993":72.07,"1994":70.98,"1995":69.88,"1996":68.82,"1997":64.25,"1998":63.64,"1999":63.9,"2000":64.21,"2001":62.96,"2002":60.99,"2003":58.61,"2004":56.81,"2005":53.7,"2006":50.53,"2007":49.28,"2008":48.51,"2009":47.55,"2010":48.71,"2011":48.31,"2012":47.37,"2013":46.81,"2014":46.34,"2015":44.02,"2016":41.86,"2017":40.16,"2018":37.72,"2019":34.54,"2020":32.61,"2021":29.03,"2022":33.46,"2023":26.98,"2024":25.87,"2025":25.04}},"CHN":{"name":"China","series":{"1991":59.64,"1992":58.5,"1993":56.4,"1994":54.3,"1995":52.2,"1996":50.5,"1997":49.9,"1998":49.8,"1999":50.1,"2000":50.04,"2001":50.0,"2002":50.0,"2003":49.1,"2004":46.9,"2005":44.8,"2006":42.6,"2007":40.8,"2008":39.6,"2009":38.1,"2010":36.7,"2011":34.8,"2012":33.6,"2013":31.4,"2014":29.5,"2015":28.3,"2016":27.42,"2017":26.68,"2018":25.75,"2019":24.72,"2020":23.6,"2021":22.87,"2022":24.08,"2023":22.8,"2024":22.22,"2025":21.68}},"BRA":{"name":"Brazil","series":{"1991":16.1,"1992":16.42,"1993":16.22,"1994":15.91,"1995":15.71,"1996":14.71,"1997":14.55,"1998":13.89,"1999":14.38,"2000":14.21,"2001":14.14,"2002":14.22,"2003":14.38,"2004":14.83,"2005":14.33,"2006":13.36,"2007":12.47,"2008":11.67,"2009":11.28,"2010":10.52,"2011":9.91,"2012":9.85,"2013":10.03,"2014":9.31,"2015":9.33,"2016":9.8,"2017":9.19,"2018":9.06,"2019":8.88,"2020":9.31,"2021":9.5,"2022":8.73,"2023":8.2,"2024":7.72,"2025":7.63}},"USA":{"name":"United States","series":{"1991":2.94,"1992":2.9,"1993":2.75,"1994":2.93,"1995":2.92,"1996":2.88,"1997":2.78,"1998":2.71,"1999":2.6,"2000":2.4,"2001":2.24,"2002":2.08,"2003":1.93,"2004":1.87,"2005":1.8,"2006":1.77,"2007":1.68,"2008":1.72,"2009":1.73,"2010":1.85,"2011":1.87,"2012":1.8,"2013":1.73,"2014":1.77,"2015":1.9,"2016":1.9,"2017":1.88,"2018":1.82,"2019":1.79,"2020":1.75,"2021":1.66,"2022":1.62,"2023":1.57,"2024":1.57,"2025":1.52}},"EGY":{"name":"Egypt, Arab Rep.","series":{"1991":39.73,"1992":39.16,"1993":36.17,"1994":36.06,"1995":34.86,"1996":32.18,"1997":32.25,"1998":30.68,"1999":29.57,"2000":30.53,"2001":29.43,"2002":28.4,"2003":30.79,"2004":32.77,"2005":31.86,"2006":32.15,"2007":32.69,"2008":31.86,"2009":30.12,"2010":28.42,"2011":29.39,"2012":27.22,"2013":28.1,"2014":27.69,"2015":25.98,"2016":25.57,"2017":25.06,"2018":21.68,"2019":21.16,"2020":20.38,"2021":19.29,"2022":18.93,"2023":18.29,"2024":17.98,"2025":17.52}},"MAR":{"name":"Morocco","series":{"1991":52.0,"1992":51.0,"1993":49.75,"1994":49.46,"1995":49.08,"1996":50.67,"1997":45.55,"1998":44.97,"1999":47.11,"2000":45.13,"2001":44.63,"2002":44.13,"2003":43.68,"2004":45.54,"2005":45.16,"2006":43.07,"2007":41.95,"2008":41.5,"2009":41.07,"2010":40.47,"2011":39.79,"2012":39.22,"2013":38.27,"2014":36.81,"2015":36.05,"2016":34.82,"2017":33.79,"2018":32.77,"2019":31.62,"2020":31.99,"2021":31.23,"2022":29.3,"2023":29.1,"2024":28.27,"2025":27.89}},"NGA":{"name":"Nigeria","series":{"1991":53.84,"1992":53.5,"1993":53.66,"1994":53.75,"1995":53.81,"1996":53.58,"1997":53.37,"1998":53.04,"1999":52.83,"2000":52.28,"2001":51.88,"2002":51.52,"2003":50.86,"2004":49.82,"2005":49.15,"2006":48.39,"2007":47.67,"2008":46.96,"2009":46.1,"2010":44.97,"2011":43.99,"2012":42.89,"2013":41.55,"2014":40.6,"2015":40.07,"2016":39.98,"2017":39.74,"2018":39.41,"2019":38.99,"2020":38.82,"2021":37.27,"2022":35.25,"2023":34.7,"2024":34.1,"2025":33.53}},"TZA":{"name":"Tanzania","series":{"1991":73.68,"1992":73.79,"1993":73.91,"1994":74.05,"1995":74.1,"1996":73.93,"1997":73.83,"1998":73.7,"1999":73.53,"2000":73.37,"2001":73.08,"2002":72.7,"2003":72.34,"2004":71.9,"2005":71.38,"2006":70.89,"2007":70.31,"2008":70.04,"2009":69.61,"2010":69.1,"2011":68.43,"2012":68.09,"2013":67.47,"2014":66.83,"2015":66.43,"2016":65.98,"2017":65.57,"2018":65.14,"2019":64.68,"2020":65.79,"2021":65.92,"2022":65.58,"2023":65.16,"2024":65.09,"2025":64.57}},"RWA":{"name":"Rwanda","series":{"1991":79.43,"1992":79.11,"1993":80.03,"1994":80.46,"1995":80.42,"1996":80.86,"1997":80.9,"1998":80.45,"1999":79.88,"2000":79.05,"2001":78.17,"2002":76.73,"2003":76.0,"2004":74.52,"2005":72.62,"2006":70.51,"2007":68.48,"2008":66.0,"2009":64.16,"2010":61.98,"2011":59.7,"2012":57.35,"2013":56.75,"2014":56.02,"2015":54.72,"2016":53.93,"2017":53.08,"2018":50.1,"2019":47.27,"2020":50.14,"2021":56.21,"2022":55.27,"2023":51.87,"2024":36.5,"2025":35.05}},"MOZ":{"name":"Mozambique","series":{"1991":84.28,"1992":84.53,"1993":84.17,"1994":84.13,"1995":84.21,"1996":83.93,"1997":83.51,"1998":83.01,"1999":82.38,"2000":82.29,"2001":81.5,"2002":80.9,"2003":80.46,"2004":79.91,"2005":79.49,"2006":78.8,"2007":78.18,"2008":77.66,"2009":77.16,"2010":76.52,"2011":75.77,"2012":74.88,"2013":74.04,"2014":73.1,"2015":72.12,"2016":71.82,"2017":71.95,"2018":71.85,"2019":71.77,"2020":73.18,"2021":73.51,"2022":73.48,"2023":73.05,"2024":73.07,"2025":73.01}}},"global_avg":{"1991":32.58,"1992":32.53,"1993":32.24,"1994":32.08,"1995":31.82,"1996":31.49,"1997":31.12,"1998":30.92,"1999":30.76,"2000":30.52,"2001":30.16,"2002":29.84,"2003":29.48,"2004":29.02,"2005":28.6,"2006":28.17,"2007":27.66,"2008":27.19,"2009":26.9,"2010":26.49,"2011":26.18,"2012":25.76,"2013":25.42,"2014":25.01,"2015":24.66,"2016":24.29,"2017":23.96,"2018":23.52,"2019":23.06,"2020":23.56,"2021":23.45,"2022":23.14,"2023":22.81,"2024":22.29,"2025":21.99}};
+
+// ── DATA SETUP ────────────────────────────────────────────────────────────
+const DATA = _D.scatter;
+const GLOBAL_AVG = _D.global_avg;
+const TS = _D.ts;
+const YEARS = Object.keys(GLOBAL_AVG).sort();
+
+const ZONE_ORDER = ['Low','Low–Med','Med–High','High','Ext. High'];
+const ZONE_COLORS = { 'Low':'#ddeeff','Low–Med':'#c5ddf5','Med–High':'#fdebc5','High':'#f9d0a8','Ext. High':'#f5b88a' };
+const ZONE_COUNTS = {};
+const ZONE_AG_AVG = {};
+ZONE_ORDER.forEach(z => {
+  const rows = DATA.filter(d => d.bws_zone === z);
+  ZONE_COUNTS[z] = rows.length;
+  ZONE_AG_AVG[z] = rows.length ? +(rows.reduce((a,b)=>a+b.ag_pct,0)/rows.length).toFixed(1) : 0;
+});
+
+// Compute overview stats
+document.getElementById('ov-exthigh').textContent = DATA.filter(d=>d.bws_score>=4).length;
+document.getElementById('ov-high').textContent = DATA.filter(d=>d.bws_score>=3&&d.bws_score<4).length;
+document.getElementById('ov-low').textContent = DATA.filter(d=>d.bws_score<1).length;
+document.getElementById('ov-hh').textContent = DATA.filter(d=>d.high_high_flag).length;
+
+// Pearson r
+const n = DATA.length;
+const mx = DATA.reduce((a,b)=>a+b.bws_score,0)/n;
+const my = DATA.reduce((a,b)=>a+b.ag_pct,0)/n;
+const num = DATA.reduce((a,b)=>a+(b.bws_score-mx)*(b.ag_pct-my),0);
+const den = Math.sqrt(DATA.reduce((a,b)=>a+(b.bws_score-mx)**2,0)*DATA.reduce((a,b)=>a+(b.ag_pct-my)**2,0));
+document.getElementById('ov-corr').textContent = (num/den).toFixed(2);
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='scatter' && !scatterInst) buildScatter();
+  if(id==='lollipop') buildLollipop();
+  if(id==='trend' && !trendInst) buildTrend();
+  if(id==='table') renderTable();
+}
+
+// ── TOOLTIP ───────────────────────────────────────────────────────────────
+const tip = document.getElementById('tooltip');
+function showTip(e, html) {
+  tip.innerHTML = html; tip.style.display = 'block';
+  moveTip(e);
+}
+function moveTip(e) {
+  const x = e.clientX + 14, y = e.clientY - 10;
+  tip.style.left = Math.min(x, window.innerWidth-240)+'px';
+  tip.style.top = Math.min(y, window.innerHeight-120)+'px';
+}
+function hideTip() { tip.style.display = 'none'; }
+document.addEventListener('mousemove', moveTip);
+
+// ── OVERVIEW CHARTS ───────────────────────────────────────────────────────
+const gridColor = '#e8e8e4';
+const tickColor = '#7a8fa0';
+
+new Chart(document.getElementById('zoneBarChart'), {
+  type: 'bar',
+  data: {
+    labels: ZONE_ORDER,
+    datasets: [{ data: ZONE_ORDER.map(z=>ZONE_COUNTS[z]), backgroundColor: ZONE_ORDER.map(z=>ZONE_COLORS[z]), borderColor: ZONE_ORDER.map(z=>ZONE_COLORS[z].replace('ff','cc')), borderWidth: 1, borderRadius: 3 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+    scales:{ x:{ticks:{font:{size:10},color:tickColor},grid:{display:false}}, y:{ticks:{font:{size:10},color:tickColor,stepSize:10},grid:{color:gridColor}} } }
+});
+
+new Chart(document.getElementById('zoneAgChart'), {
+  type: 'bar',
+  data: {
+    labels: ZONE_ORDER,
+    datasets: [{ data: ZONE_ORDER.map(z=>ZONE_AG_AVG[z]), backgroundColor: ['#0072B2','#0099cc','#f5b840','#D55E00','#c0390a'], borderRadius: 3, borderWidth: 0 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+    scales:{ x:{ticks:{font:{size:10},color:tickColor},grid:{display:false}}, y:{ticks:{font:{size:10},color:tickColor,callback:v=>v+'%'},grid:{color:gridColor},max:60} } }
+});
+
+// Region chart
+const REGIONS = [...new Set(DATA.map(d=>d.region))].sort();
+const regBWS = REGIONS.map(r=>+(DATA.filter(d=>d.region===r).reduce((a,b)=>a+b.bws_score,0)/DATA.filter(d=>d.region===r).length).toFixed(2));
+const regAG = REGIONS.map(r=>+(DATA.filter(d=>d.region===r).reduce((a,b)=>a+b.ag_pct,0)/DATA.filter(d=>d.region===r).length).toFixed(1));
+
+new Chart(document.getElementById('regionChart'), {
+  type: 'bar',
+  data: {
+    labels: REGIONS.map(r=>r.replace(' & ',' &\n')),
+    datasets: [
+      { label:'Avg BWS score', data:regBWS, backgroundColor:'#0072B222', borderColor:'#0072B2', borderWidth:1.5, borderRadius:3, yAxisID:'y' },
+      { label:'Avg ag. employment %', data:regAG, backgroundColor:'#D55E0022', borderColor:'#D55E00', borderWidth:1.5, borderRadius:3, yAxisID:'y2' }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'top', labels:{font:{size:11},color:tickColor,boxWidth:12} } },
+    scales:{
+      x:{ticks:{font:{size:10},color:tickColor},grid:{display:false}},
+      y:{position:'left',title:{display:true,text:'Avg BWS (0–5)',font:{size:10},color:'#0072B2'},ticks:{font:{size:10},color:tickColor},grid:{color:gridColor},max:5},
+      y2:{position:'right',title:{display:true,text:'Avg ag. employment %',font:{size:10},color:'#D55E00'},ticks:{font:{size:10},color:tickColor,callback:v=>v+'%'},grid:{display:false},max:60}
+    }
+  }
+});
+
+// ── SCATTER ───────────────────────────────────────────────────────────────
+let scatterInst = null;
+let activeRegion = 'all';
+
+function bwsZoneColor(score) {
+  if(score < 1) return '#c5ddf5';
+  if(score < 2) return '#a8ccee';
+  if(score < 3) return '#f5c878';
+  if(score < 4) return '#e8935a';
+  return '#d9622a';
+}
+
+function setRegionFilter(region, btn) {
+  activeRegion = region;
+  document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildScatter();
+}
+
+function buildScatter() {
+  const filtered = activeRegion === 'all' ? DATA : DATA.filter(d=>d.region===activeRegion);
+  const regular = filtered.filter(d=>!d.high_high_flag);
+  const highhigh = filtered.filter(d=>d.high_high_flag);
+
+  const regularPts = regular.map(d=>({ x:+d.bws_score.toFixed(3), y:+d.ag_pct.toFixed(2), iso:d.iso3, name:d.country_bws, bws:d.bws_score, ag:d.ag_pct, zone:d.bws_zone, region:d.region, year:d.year_used }));
+  const hhPts = highhigh.map(d=>({ x:+d.bws_score.toFixed(3), y:+d.ag_pct.toFixed(2), iso:d.iso3, name:d.country_bws, bws:d.bws_score, ag:d.ag_pct, zone:d.bws_zone, region:d.region, year:d.year_used }));
+
+  const canvas = document.getElementById('scatterChart');
+  if(scatterInst) { scatterInst.destroy(); scatterInst = null; }
+
+  scatterInst = new Chart(canvas, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: 'Countries',
+          data: regularPts,
+          backgroundColor: regularPts.map(p=>bwsZoneColor(p.bws)+'bb'),
+          borderColor: regularPts.map(p=>bwsZoneColor(p.bws)),
+          borderWidth: 0.8,
+          pointRadius: 6, pointHoverRadius: 8
+        },
+        {
+          label: 'High-high flag',
+          data: hhPts,
+          backgroundColor: '#D55E00cc',
+          borderColor: '#8B2500',
+          borderWidth: 1.5,
+          pointRadius: 9, pointHoverRadius: 11,
+          pointStyle: 'circle'
+        }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: {
+        legend: { position:'top', labels:{font:{size:11},color:tickColor,boxWidth:10} },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const p = ctx.raw;
+              return [`${p.name} (${p.iso})`, `BWS: ${p.bws.toFixed(2)} — ${p.zone}`, `Ag. employment: ${p.ag.toFixed(1)}%`, `Year: ${p.year}`];
+            }
+          },
+          backgroundColor: 'white', borderColor: '#dddbd3', borderWidth: 1,
+          titleColor: '#0f1923', bodyColor: '#3a4a58', titleFont:{size:12,weight:'bold'},
+          padding: 10, boxPadding: 4
+        },
+        annotation: { annotations: {} }
+      },
+      scales: {
+        x: { min:0, max:5.1, ticks:{values:[0,1,2,3,4,5],font:{size:12},color:tickColor},
+             title:{display:true,text:'Baseline Water Stress score (WRI Aqueduct 4.0)',font:{size:13},color:tickColor},
+             grid:{color:gridColor} },
+        y: { min:-1, max:90, ticks:{font:{size:12},color:tickColor,callback:v=>v+'%'},
+             title:{display:true,text:'Employment in agriculture (% of total)',font:{size:13},color:tickColor},
+             grid:{color:gridColor} }
+      }
+    }
+  });
+
+  // Labels for high-high points
+  const plugin = {
+    id: 'hhLabels',
+    afterDraw(chart) {
+      const ctx2 = chart.ctx;
+      const ds = chart.data.datasets[1];
+      if(!ds||!ds.data.length) return;
+      const meta = chart.getDatasetMeta(1);
+      ctx2.save();
+      ds.data.forEach((pt, i) => {
+        const el = meta.data[i];
+        if(!el) return;
+        ctx2.fillStyle = '#8B2500';
+        ctx2.font = 'bold 10px "DM Sans", sans-serif';
+        ctx2.textAlign = 'left';
+        ctx2.fillText(pt.iso, el.x + 8, el.y - 4);
+      });
+      ctx2.restore();
+    }
+  };
+  scatterInst.register ? null : Chart.register(plugin);
+  scatterInst._hhLabelsPlugin = plugin;
+}
+
+// Patch: draw labels after each render
+Chart.register({
+  id: 'hhLabels',
+  afterDraw(chart) {
+    if(chart.canvas.id !== 'scatterChart') return;
+    const ds = chart.data.datasets[1];
+    if(!ds||!ds.data.length) return;
+    const meta = chart.getDatasetMeta(1);
+    const ctx2 = chart.ctx;
+    ctx2.save();
+    ds.data.forEach((pt, i) => {
+      const el = meta.data[i];
+      if(!el) return;
+      ctx2.fillStyle = '#8B2500';
+      ctx2.font = 'bold 10.5px sans-serif';
+      ctx2.textAlign = 'left';
+      ctx2.fillText(pt.iso, el.x + 8, el.y - 4);
+    });
+    ctx2.restore();
+  }
+});
+
+// ── LOLLIPOP ──────────────────────────────────────────────────────────────
+function agColor(ag_pct) {
+  const t = Math.min(ag_pct / 80, 1);
+  const r = Math.round(180 + t * 75);
+  const g = Math.round(120 - t * 80);
+  const b = Math.round(30 - t * 20);
+  return `rgb(${r},${g},${b})`;
+}
+
+function buildLollipop() {
+  const top20 = [...DATA].sort((a,b)=>b.bws_score-a.bws_score).slice(0,20);
+  const container = document.getElementById('lollipop-container');
+  const maxBWS = 5;
+  const maxAg = Math.max(...top20.map(d=>d.ag_pct));
+
+  container.innerHTML = top20.map(d => {
+    const fillW = (d.bws_score / maxBWS * 100).toFixed(1);
+    const agW = (d.ag_pct / maxAg * 100).toFixed(1);
+    const col = agColor(d.ag_pct);
+    const zoneBadge = `<span style="font-size:10px;color:var(--ink3)">${d.bws_zone}</span>`;
+    return `<div class="lollipop-row" 
+              onmouseenter="showTip(event,'<strong>${d.country_bws} (${d.iso3})</strong>BWS: ${d.bws_score.toFixed(2)}<br>Zone: ${d.bws_zone}<br>Ag. employment: ${d.ag_pct.toFixed(1)}%<br>Year: ${d.year_used}')"
+              onmouseleave="hideTip()">
+      <div class="lp-label" title="${d.country_bws}">${d.country_bws}</div>
+      <div class="lp-bar-wrap">
+        <div class="lp-track"></div>
+        <div class="lp-fill" style="width:${fillW}%;background:${col}"></div>
+        <div class="lp-dot" style="left:${fillW}%;background:${col}"></div>
+      </div>
+      <div class="lp-val">${d.bws_score.toFixed(2)}</div>
+      <div class="ag-micro" style="background:linear-gradient(to right,${col} ${agW}%,var(--line) ${agW}%)" title="Ag. ${d.ag_pct.toFixed(1)}%"></div>
+      <div style="width:36px;font-size:11px;color:var(--ink3);flex-shrink:0">${d.ag_pct.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+
+  // Legend for lollipop
+  container.insertAdjacentHTML('beforeend', `
+    <div style="display:flex;gap:20px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--ink3);align-items:center;flex-wrap:wrap">
+      <span>Lollipop bar = BWS score (0–5)</span>
+      <span>Mini bar = Agricultural employment %</span>
+      <span style="display:flex;align-items:center;gap:6px">Color intensity: 
+        <span style="background:linear-gradient(to right,${agColor(0)},${agColor(40)},${agColor(80)});width:80px;height:8px;border-radius:4px;display:inline-block"></span>
+        low → high ag. employment</span>
+    </div>`);
+}
+
+// ── TRENDS ────────────────────────────────────────────────────────────────
+let trendInst = null;
+
+function buildTrend() {
+  const ctx = document.getElementById('globalTrendChart').getContext('2d');
+  trendInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: YEARS,
+      datasets: [{
+        label: 'Global average ag. employment %',
+        data: YEARS.map(y=>GLOBAL_AVG[y]),
+        borderColor: '#0072B2', backgroundColor: '#0072B218',
+        fill: true, tension: 0.35, pointRadius: 2, borderWidth: 2
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`${c.parsed.y.toFixed(1)}%`}} },
+      scales:{
+        x:{ ticks:{font:{size:10},color:tickColor,maxRotation:45,maxTicksLimit:16}, grid:{color:gridColor} },
+        y:{ min:0, ticks:{font:{size:11},color:tickColor,callback:v=>v+'%'}, grid:{color:gridColor},
+            title:{display:true,text:'% of total employment',font:{size:11},color:tickColor} }
+      }
+    }
+  });
+
+  // Multi-country trend
+  const PALETTE = ['#D55E00','#E69F00','#CC79A7','#56B4E9','#0072B2','#009E73','#999999','#F0E442'];
+  const HH_ISOS = DATA.filter(d=>d.high_high_flag).map(d=>d.iso3);
+  const peers = ['CHN','VNM','BGD','ETH','KEN','BRA','MAR'];
+  const allCountries = [...HH_ISOS, ...peers];
+
+  const datasets = allCountries.map((iso,i) => {
+    const info = TS[iso];
+    if(!info) return null;
+    const isHH = HH_ISOS.includes(iso);
+    return {
+      label: `${info.name} (${iso})`,
+      data: YEARS.map(y=>info.series[y]||null),
+      borderColor: isHH ? PALETTE[HH_ISOS.indexOf(iso)] : PALETTE[4 + peers.indexOf(iso)],
+      backgroundColor: 'transparent',
+      borderWidth: isHH ? 2.5 : 1.5,
+      borderDash: isHH ? [] : [4,3],
+      tension: 0.3, pointRadius: 1.5, pointHoverRadius: 4
+    };
+  }).filter(Boolean);
+
+  // Add global avg
+  datasets.push({
+    label: 'Global average',
+    data: YEARS.map(y=>GLOBAL_AVG[y]),
+    borderColor: '#888888', backgroundColor: 'transparent',
+    borderWidth: 1, borderDash: [2,2], tension: 0.3, pointRadius: 0
+  });
+
+  new Chart(document.getElementById('multiTrendChart'), {
+    type: 'line',
+    data: { labels: YEARS, datasets },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:'right', labels:{font:{size:10},color:tickColor,boxWidth:16,padding:8} },
+        tooltip:{ callbacks:{ label:c=>`${c.dataset.label}: ${c.parsed.y!=null?c.parsed.y.toFixed(1)+'%':'N/A'}` } }
+      },
+      scales:{
+        x:{ ticks:{font:{size:10},color:tickColor,maxRotation:45,maxTicksLimit:16}, grid:{color:gridColor} },
+        y:{ min:0, ticks:{font:{size:11},color:tickColor,callback:v=>v+'%'}, grid:{color:gridColor} }
+      }
+    }
+  });
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────────
+let tData = [...DATA].sort((a,b)=>b.bws_score-a.bws_score).map((d,i)=>({...d,rank:i+1}));
+let tFiltered = [...tData];
+let tSort = 'bws_score', tDir = -1, tPage = 0;
+const TPG = 25;
+
+const ZONE_BADGE_STYLE = {
+  'Low': 'background:#ddeeff;color:#1a5080',
+  'Low–Med': 'background:#c5ddf5;color:#1a5080',
+  'Med–High': 'background:#fdebc5;color:#7a4800',
+  'High': 'background:#f9d0a8;color:#8b2e00',
+  'Ext. High': 'background:#f5b88a;color:#8b1a00'
+};
+
+function bwsFillColor(score) {
+  if(score < 1) return '#0072B2';
+  if(score < 2) return '#56B4E9';
+  if(score < 3) return '#E69F00';
+  if(score < 4) return '#D55E00';
+  return '#b22200';
+}
+
+function renderTable() {
+  const maxBWS = 5;
+  const sl = tFiltered.slice(tPage*TPG, (tPage+1)*TPG);
+  document.getElementById('tbl-body').innerHTML = sl.map(d => {
+    const fillW = (d.bws_score/maxBWS*100).toFixed(0);
+    const col = bwsFillColor(d.bws_score);
+    const zStyle = ZONE_BADGE_STYLE[d.bws_zone] || '';
+    const hhBadge = d.high_high_flag ? '<span class="flag-badge">High-high</span>' : '';
+    return `<tr style="${d.high_high_flag?'background:#fff8f5;':''}" onmouseenter="showTip(event,'<strong>${d.country_bws}</strong><br>BWS: ${d.bws_score.toFixed(2)}<br>Ag: ${d.ag_pct.toFixed(1)}%')" onmouseleave="hideTip()">
+      <td style="color:var(--ink3);font-size:11px">${d.rank}</td>
+      <td style="font-weight:600;font-size:12px;color:var(--ink3)">${d.iso3}</td>
+      <td style="font-weight:500">${d.country_bws}</td>
+      <td><span style="font-weight:600;color:${col}">${d.bws_score.toFixed(2)}</span><span class="bws-bar-bg"><span class="bws-bar-fill" style="width:${fillW}%;background:${col}"></span></span></td>
+      <td><span class="zone-badge" style="${zStyle}">${d.bws_zone}</span></td>
+      <td style="font-weight:500">${d.ag_pct.toFixed(1)}%</td>
+      <td style="color:var(--ink3);font-size:12px">${d.year_used}</td>
+      <td>${hhBadge}</td>
+      <td style="font-size:11px;color:var(--ink3)">${d.region.replace(' & ','&')}</td>
+    </tr>`;
+  }).join('');
+  const tp = Math.ceil(tFiltered.length/TPG)||1;
+  document.getElementById('tpg-info').textContent = `Page ${tPage+1} of ${tp} · ${tFiltered.length} countries`;
+  document.getElementById('tbl-count').textContent = `${tFiltered.length} of 161 countries`;
+}
+
+function filterTbl() {
+  const q = document.getElementById('tbl-q').value.toLowerCase();
+  const zone = document.getElementById('tbl-zone').value;
+  const hhOnly = document.getElementById('tbl-hh').checked;
+  tFiltered = tData.filter(d => {
+    if(q && !d.country_bws.toLowerCase().includes(q) && !d.iso3.toLowerCase().includes(q)) return false;
+    if(zone && d.bws_zone !== zone) return false;
+    if(hhOnly && !d.high_high_flag) return false;
+    return true;
+  });
+  applyTSort(); tPage=0; renderTable();
+}
+
+function applyTSort() {
+  tFiltered.sort((a,b)=>{
+    let av=a[tSort],bv=b[tSort];
+    if(av===null||av===undefined) av=tDir>0?Infinity:-Infinity;
+    if(bv===null||bv===undefined) bv=tDir>0?Infinity:-Infinity;
+    return typeof av==='string' ? tDir*av.localeCompare(bv) : tDir*(av-bv);
+  });
+}
+
+function sortTbl(col) {
+  if(tSort===col) tDir*=-1; else { tSort=col; tDir=col==='bws_score'||col==='ag_pct'?-1:1; }
+  ['rank','iso3','country_bws','bws_score','bws_zone','ag_pct','year_used'].forEach(c=>{
+    const el=document.getElementById('ta-'+c);
+    if(el) el.textContent = c===tSort?(tDir===1?' ↑':' ↓'):'';
+  });
+  applyTSort(); tPage=0; renderTable();
+}
+
+function tpg(d) {
+  const tp=Math.ceil(tFiltered.length/TPG)||1;
+  tPage=Math.max(0,Math.min(tp-1,tPage+d));
+  renderTable();
+}
+</script>
+</body>
+</html>
